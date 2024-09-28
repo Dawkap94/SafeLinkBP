@@ -1,38 +1,30 @@
-document.getElementById("check_button").addEventListener("click", () => {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    chrome.scripting.executeScript({
-      target: { tabId: tabs[0].id },
-      function: checkPageSafety,
-    });
+document.addEventListener('DOMContentLoaded', function () {
+  console.log("DOM fully loaded and parsed");
+
+  const checkButton = document.getElementById('checkButton');
+  if (!checkButton) {
+    console.error('The check button is not found.');
+    return;
+  }
+
+  checkButton.addEventListener('click', function() {
+    console.log("Button clicked");
+    const url = document.getElementById('urlInput').value;
+    if (!url) {
+      console.log("No URL provided");
+      return;
+    }
+    const apiUrl = `http://127.0.0.1:5000/check_safety?url=$${encodeURIComponent(url)}`;
+    console.log("Sending request to:", apiUrl);
+
+    fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => {
+        console.log("Received response:", data);
+        document.getElementById('response').innerText = JSON.stringify(data);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
   });
 });
-
-function checkPageSafety() {
-  const url = window.location.href;
-
-  console.log("Checking safety for:", url);
-
-  fetch("http://localhost:5000/check_safety?url=$https://www.google.com", {
-    mode: "no-cors",
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.json();
-    })
-    .then((data) => {
-      console.log(data);
-      if (data.safe) {
-        alert("This site is safe!");
-      } else {
-        alert("Warning! This site may not be safe.");
-      }
-    })
-    .catch((error) => {
-      console.error(
-        "There has been a problem with your fetch operation:",
-        error
-      );
-    });
-}
