@@ -1,14 +1,11 @@
 import re
 
 from flask import Flask, request
-
-
-app = Flask(__name__)
-
 import whois
 import socket
 import requests
 
+app = Flask(__name__)
 
 def get_domain_info(domain):
     try:
@@ -28,10 +25,9 @@ def get_domain_info(domain):
 def get_ip_address(domain):
     try:
         ip_address = socket.gethostbyname(domain)
-        print("\nIP Address of", domain, "is:", ip_address)
-        return ip_address
+        return {'ip_address': ip_address}
     except socket.gaierror:
-        print(f"Unable to get IP address for {domain}")
+        return {'ip_address': 'Unable to get IP address'}
         return None
 
 
@@ -50,8 +46,7 @@ def get_geolocation(ip_address):
             },
         }
     except Exception as e:
-        return {'geoinfo': f'None, {e}'}
-        print(f"Error getting geolocation: {e}")
+        return {'geoinfo': f'Error getting geolocation: {e}'}
 
 
 @app.route('/check_safety', methods=['GET'])
@@ -59,11 +54,20 @@ def check_safety():
     domain_is_safe = False
     url = request.args.get('url')
     raw_url = url[1:]
+
+    response = re.search(r'(http|https)://www\.(\w|\d)+\.\w+', raw_url)
+
+    domain_is_valid = True if response else False
+
+    if not domain_is_valid:
+        return {
+            'error': 'Domain is not in requested format. https://www.example.com'
+        }
+
     headers_dict = dict(requests.get(raw_url).headers)
 
     domain = re.sub('(https://|http://|wwww.|https://www.|http://www.)', '', raw_url)
     domain_info = get_domain_info(domain)
-
 
     ip_address = get_ip_address(domain)
 
