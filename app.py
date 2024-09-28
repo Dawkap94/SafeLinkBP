@@ -1,13 +1,11 @@
 import re
 
 from flask import Flask, request
-
-
-app = Flask(__name__)
-
 import whois
 import socket
 import requests
+
+app = Flask(__name__)
 
 
 def get_domain_info(domain):
@@ -28,18 +26,28 @@ def get_domain_info(domain):
 def get_ip_address(domain):
     try:
         ip_address = socket.gethostbyname(domain)
-        print("\nIP Address of", domain, "is:", ip_address)
-        return ip_address
+        return {'ip_address': ip_address}
     except socket.gaierror:
-        print(f"Unable to get IP address for {domain}")
-        return None
+        return {'ip_address': 'Unable to get IP address'}
+
+
+def check_cert_base(domain: str) -> bool:
+    with open('cert_domains.txt', 'r') as file:
+        for line in file:
+            domain.replace('https://', '').replace('http://', '')
+            if domain == line.strip():
+                return True
+
+        return False
 
 
 def get_geolocation(ip_address):
     try:
-        response = requests.get(f"https://ipinfo.io/{ip_address}/json")
+        ip = ip_address.get('ip_address')
+        response = requests.get(f"https://ipinfo.io/{ip}/json")
         data = response.json()
-        return {'geoinfo':
+        return {
+            'geoinfo':
             {
                 'ip': data.get('ip'),
                 'city': data.get('city'),
@@ -50,29 +58,45 @@ def get_geolocation(ip_address):
             },
         }
     except Exception as e:
-        return {'geoinfo': f'None, {e}'}
-        print(f"Error getting geolocation: {e}")
-
+        return {'geoinfo': f'Error getting geolocation: {e}'}
 
 @app.route('/check_safety', methods=['GET'])
 def check_safety():
     domain_is_safe = False
     url = request.args.get('url')
+
     raw_url = url[1:]
-    headers_dict = dict(requests.get(raw_url).headers)
+    domain = re.sub(r'(https|http)://', '', raw_url)
+    cert_blacklisted = check_cert_base(domain)
+
+    response = re.search(r'(http|https)://\w+\.\w+', raw_url)
+
+    domain_is_valid = True if response else False
+
+    if not domain_is_valid:
+        return {
+            'error': 'Domain is not in requested format. https://www.example.com'
+        }
+
+    try:
+        headers_dict = dict(requests.get(raw_url).headers)
+    except Exception as e:
+        headers_dict = {'error': None}
 
     domain = re.sub('(https://|http://|wwww.|https://www.|http://www.)', '', raw_url)
     domain_info = get_domain_info(domain)
 
-
     ip_address = get_ip_address(domain)
 
     geo_localization = get_geolocation(ip_address) if ip_address else None
+    if not cert_blacklisted:
+        domain_is_safe = True
 
     response_json = {
         'url': raw_url,
         'ip_address': ip_address,
         'safe': domain_is_safe,
+        'cert_blacklisted': cert_blacklisted ,
         'headers': headers_dict,
         'geo_localization': geo_localization,
         'domain_info': domain_info
