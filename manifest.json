@@ -1,11 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "Check Safety",
+  "name": "SafeLinkBP",
   "version": "1.0",
   "description": "Check URL safety via API.",
-  "permissions": [
-    "activeTab"
-  ],
+  "permissions": ["activeTab"],
   "action": {
     "default_popup": "popup.html"
   }

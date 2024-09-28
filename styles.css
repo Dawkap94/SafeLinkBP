@@ -1,9 +1,14 @@
 .main_container {
   width: 300px;
   padding: 10px;
-  background-color: blanchedalmond;
   display: flex;
   flex-direction: column;
+}
+
+.logo_container {
+  display: flex;
+  justify-content: start;
+  gap: 1rem;
 }
 
 .input_container {
