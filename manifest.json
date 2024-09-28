@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "SafeLinkBP",
+  "version": "1.0",
+  "description": "Plugin that checks if a website is safe.",
+  "permissions": ["tabs", "activeTab", "scripting", "storage"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  }
+}

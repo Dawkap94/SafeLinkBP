@@ -1,0 +1,35 @@
+.main_container {
+  width: 300px;
+  padding: 10px;
+  background-color: blanchedalmond;
+  display: flex;
+  flex-direction: column;
+}
+
+.input_container {
+  padding: 6px 3px;
+  font-size: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.input_container input {
+  padding: 6px 12px;
+  border-radius: 4px;
+  outline: none;
+}
+
+.check_button {
+  padding: 6px 12px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.check_button:hover {
+  background-color: #2980b9;
+}
