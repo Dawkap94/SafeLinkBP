@@ -12,8 +12,9 @@ CORS(app)
 
 
 def get_domain_info(domain):
+    short_domain = domain.replace('www.', '', 1)
     try:
-        domain_info = whois.whois(domain)
+        domain_info = whois.whois(short_domain)
         domain_output = {
             'registered_on': domain_info.creation_date,
             'expiration_date': domain_info.expiration_date,
@@ -43,10 +44,9 @@ def check_cert_base(domain: str) -> bool:
 
         return False
 
-def check_adguard_base(domain: str) -> bool:
+def check_rbllist(domain: str) -> bool:
     with open('utils/adguard_domains.txt', 'r') as file:
         cleaned_domain = re.sub(r'(https://www.|http://www.|http://|https://|www.)', '', domain)
-        print(cleaned_domain)
         for line in file:
             if cleaned_domain == line.strip():
                 return True
@@ -97,13 +97,13 @@ def check_safety():
     url = request.args.get('url')
 
     raw_url = url[1:]
-    is_domain_in_adguard_base = check_adguard_base(raw_url)
-    domain = re.sub(r'^(https://|http://|www\.)', '', url)
+    is_domain_in_rbllist = check_rbllist(raw_url)
+    domain = re.sub(r'^(\$https://|\$http://|\$www\.)', '', url)
     cert_blacklisted = check_cert_base(domain)
-
     response = re.search(r'(http|https)://\w+\.\w+', raw_url)
 
     domain_is_valid = True if response else False
+    ip_address = get_ip_address(raw_url)
 
     if not domain_is_valid:
         return {
@@ -111,7 +111,6 @@ def check_safety():
         }
 
     try:
-        ip_address = get_ip_address(domain)
         headers_dict = dict(requests.get(raw_url).headers)
         ip_address = get_ip_address(domain)
         ip_in_spamlist = check_spamip_list(ip_address)
@@ -130,7 +129,7 @@ def check_safety():
             not cert_blacklisted
             and not ip_in_spamlist
             and raw_url.startswith('https')
-            and not is_domain_in_adguard_base
+            and not is_domain_in_rbllist
     ):
         domain_is_safe = True
 
@@ -138,16 +137,16 @@ def check_safety():
         'url': raw_url,
         'ip_address': ip_address,
         'safe': domain_is_safe,
-        'cert_blacklisted': cert_blacklisted,
         'headers': headers_dict,
         'geo_localization': geo_localization,
         'domain_info': domain_info,
-        'in_spamlist': ip_in_spamlist,
-        'in_adguard_base': is_domain_in_adguard_base
+        'in_cert_blacklist': cert_blacklisted,
+        'in_spamhaus_spamlist': ip_in_spamlist,
+        'in_rbllist': is_domain_in_rbllist
     }
 
     return response_json
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
