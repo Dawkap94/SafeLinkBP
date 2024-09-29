@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const responseElement = document.getElementById("response");
 
         responseElement.innerHTML = "";
-
+        redirectButton.classList.add("hidden");
         if (data.safe === true) {
           responseElement.style.backgroundColor = "#d4edda";
           redirectButton.classList.remove("hidden");
