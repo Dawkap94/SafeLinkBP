@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const checkButton = document.getElementById("checkButton");
   const showMoreButton = document.getElementById("showMoreBtn");
   const redirectButton = document.getElementById("redirectBtn");
+  const loadingElement = document.getElementById("loading");
 
   if (!checkButton) {
     console.error("The check button is not found.");
@@ -24,6 +25,8 @@ document.addEventListener("DOMContentLoaded", function () {
       url
     )}`;
     console.log("Sending request to:", apiUrl);
+
+    loadingElement.style.display = "block";
 
     fetch(apiUrl)
       .then((response) => response.json())
@@ -102,6 +105,9 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .catch((error) => {
         console.error("Error:", error);
+      })
+      .finally(() => {
+        loadingElement.style.display = "none";
       });
   });
 
