@@ -151,4 +151,8 @@ def check_safety():
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(
+        debug=False,
+        host='::',
+        port=40150,
+    )
