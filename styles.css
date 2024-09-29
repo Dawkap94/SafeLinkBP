@@ -64,7 +64,8 @@
   padding: 2px 0;
 }
 
-#showMoreBtn {
+#showMoreBtn,
+#redirectBtn {
   margin: 4px;
   padding: 4px 8px;
   background-color: #3498db;

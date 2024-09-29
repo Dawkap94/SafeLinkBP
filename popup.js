@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const checkButton = document.getElementById("checkButton");
   const showMoreButton = document.getElementById("showMoreBtn");
+  const redirectButton = document.getElementById("redirectBtn");
 
   if (!checkButton) {
     console.error("The check button is not found.");
@@ -19,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
       console.log("No URL provided");
       return;
     }
-    const apiUrl = `http://127.0.0.1:5000/check_safety?url=$${encodeURIComponent(
+    const apiUrl = `https://safelinkbp.bieda.it/check_safety?url=$${encodeURIComponent(
       url
     )}`;
     console.log("Sending request to:", apiUrl);
@@ -36,6 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (data.safe === true) {
           responseElement.style.backgroundColor = "#d4edda";
+          redirectButton.classList.remove("hidden");
         } else if (data.safe === false) {
           responseElement.style.backgroundColor = "#f8d7da";
         } else {
@@ -113,6 +115,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (responsePlusElement) {
       responsePlusElement.classList.toggle("hidden");
+    }
+  });
+
+  redirectButton.addEventListener("click", function () {
+    if (fetchedData && fetchedData.safe === true) {
+      const url = document.getElementById("urlInput").value;
+      if (url) {
+        console.log(`Redirecting to ${url} because data.safe is true`);
+        window.open(url, "_blank"); // Open URL in a new tab
+      }
+    } else {
+      console.log("Cannot redirect, data.safe is not true.");
     }
   });
 });
