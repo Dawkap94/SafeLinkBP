@@ -77,6 +77,12 @@
   font-weight: 700;
 }
 
+#loading {
+  text-align: center;
+  padding: 6px;
+  display: none;
+}
+
 .hidden {
   display: none;
 }
