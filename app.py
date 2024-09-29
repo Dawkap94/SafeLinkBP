@@ -6,6 +6,8 @@ import socket
 import requests
 from flask_cors import CORS
 import ipaddress
+from urllib.parse import urlparse
+
 
 app = Flask(__name__)
 CORS(app)
@@ -47,6 +49,7 @@ def check_cert_base(domain: str) -> bool:
         return False
 
 def check_rbllist(domain: str) -> bool:
+    domain = urlparse(domain).netloc
     with open('utils/adguard_domains.txt', 'r') as file:
         cleaned_domain = re.sub(r'(https://www.|http://www.|http://|https://|www.)', '', domain)
         for line in file:
