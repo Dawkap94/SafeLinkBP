@@ -15,6 +15,7 @@ def get_domain_info(domain):
     short_domain = domain.replace('www.', '', 1)
     try:
         domain_info = whois.whois(short_domain)
+        print(domain_info)
         domain_output = {
             'registered_on': domain_info.creation_date,
             'expiration_date': domain_info.expiration_date,
@@ -36,10 +37,11 @@ def get_ip_address(domain):
 
 
 def check_cert_base(domain: str) -> bool:
+    print(domain)
     with open('utils/cert_domains.txt', 'r') as file:
         for line in file:
-            domain.replace('https://', '').replace('http://', '')
-            if domain == line.strip():
+            domain.replace('https://', '').replace('http://', '').replace('www.', '')
+            if domain.lstrip('www.') == line.strip():
                 return True
 
         return False
@@ -149,8 +151,4 @@ def check_safety():
 
 
 if __name__ == '__main__':
-    app.run(
-        debug=False,
-        host='0.0.0.0',
-        port=5000
-    )
+    app.run(debug=False)
