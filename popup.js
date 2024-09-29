@@ -2,13 +2,18 @@ document.addEventListener("DOMContentLoaded", function () {
   console.log("DOM fully loaded and parsed");
 
   const checkButton = document.getElementById("checkButton");
+  const showMoreButton = document.getElementById("showMoreBtn");
+
   if (!checkButton) {
     console.error("The check button is not found.");
     return;
   }
 
+  let fetchedData = null;
+
   checkButton.addEventListener("click", function () {
     console.log("Button clicked");
+
     const url = document.getElementById("urlInput").value;
     if (!url) {
       console.log("No URL provided");
@@ -22,19 +27,19 @@ document.addEventListener("DOMContentLoaded", function () {
     fetch(apiUrl)
       .then((response) => response.json())
       .then((data) => {
+        fetchedData = data;
         console.log("Received response:", data);
 
         const responseElement = document.getElementById("response");
 
-        // Clear previous content
         responseElement.innerHTML = "";
 
         if (data.safe === true) {
-          responseElement.style.backgroundColor = "#d4edda"; // light green
+          responseElement.style.backgroundColor = "#d4edda";
         } else if (data.safe === false) {
-          responseElement.style.backgroundColor = "#f8d7da"; // light red
+          responseElement.style.backgroundColor = "#f8d7da";
         } else {
-          responseElement.style.backgroundColor = ""; // Reset background color if safe is not defined
+          responseElement.style.backgroundColor = "";
         }
 
         const omittedElements = [
@@ -44,57 +49,70 @@ document.addEventListener("DOMContentLoaded", function () {
           "set-cookie",
         ];
 
-        // Recursive function to display nested values
         function displayData(data, parentElement) {
           Object.keys(data).forEach((key) => {
             if (omittedElements.includes(key)) return;
             const value = data[key];
 
-            // Create a new paragraph or div element for each key-value pair
             const itemElement = document.createElement("div");
 
+            if (key === "error") {
+              itemElement.style.backgroundColor = "#f8d7da";
+              itemElement.style.color = "#721c24";
+              itemElement.style.fontWeight = 700;
+              itemElement.style.padding = "4px";
+              itemElement.style.borderRadius = "4px";
+            }
+
             if (typeof value === "object" && value !== null) {
-              // If the value is an object or array, display the key and recurse
               const nestedTitle = document.createElement("strong");
               nestedTitle.innerText = `${key}:`;
               itemElement.appendChild(nestedTitle);
-
-              // Recursively display nested values
               displayData(value, itemElement);
             } else {
-              // If the value is a primitive type, check if it's true or false
               let displayValue;
               if (value === true) {
-                displayValue = "✔"; // Display checkmark for true
+                displayValue = "✔";
               } else if (value === false) {
-                displayValue = "✗"; // Display cross for false
+                displayValue = "✗";
+              } else if (value === null) {
+                displayValue = "no data";
               } else {
-                displayValue = value; // Display the value as is
+                displayValue = value;
               }
 
-              // Set the text to key: value (with symbols for true/false)
               itemElement.innerText = `${key}: ${displayValue}`;
             }
 
-            // Append the created element to the parent
             parentElement.appendChild(itemElement);
+            const showMoreBtn = document.getElementById("showMoreBtn");
+            showMoreBtn.classList.remove("hidden");
           });
         }
 
-        // Start displaying data
         displayData(data, responseElement);
 
-        if (data.safe) {
-        }
-
-        // document.getElementById("response").innerText = JSON.stringify(
-        //   data,
-        //   null,
-        //   2
-        // );
+        document.getElementById("response_plus").innerText = JSON.stringify(
+          data,
+          null,
+          2
+        );
       })
       .catch((error) => {
         console.error("Error:", error);
       });
+  });
+
+  showMoreButton.addEventListener("click", function () {
+    const responseElement = document.getElementById("response");
+    const responsePlusElement = document.getElementById("response_plus");
+
+    if (responseElement) {
+      responseElement.classList.toggle("hidden");
+    }
+
+    if (responsePlusElement) {
+      responsePlusElement.classList.toggle("hidden");
+    }
   });
 });

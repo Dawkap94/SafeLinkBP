@@ -37,25 +37,33 @@
 }
 
 .check_button {
-  padding: 6px 12px;
+  padding: 8px 12px;
   background-color: #3498db;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  font-weight: 700;
 }
 
 .check_button:hover {
   background-color: #2980b9;
 }
 
-#response {
+#response,
+#response_plus {
   padding: 8px;
 }
 
 #response div,
-#response strong {
+#response strong,
+#response_plus div,
+#response_plus strong {
   font-size: 14px;
   padding: 2px 0;
+}
+
+.hidden {
+  display: none;
 }
