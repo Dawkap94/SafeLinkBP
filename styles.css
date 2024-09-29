@@ -64,6 +64,18 @@
   padding: 2px 0;
 }
 
+#showMoreBtn {
+  margin: 4px;
+  padding: 4px 8px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-weight: 700;
+}
+
 .hidden {
   display: none;
 }
