@@ -28,6 +28,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     loadingElement.style.display = "block";
 
+    const responseElement = document.getElementById("response");
+    const responsePlusElement = document.getElementById("response_plus");
+    responseElement.classList.add("hidden");
+    responsePlusElement.classList.add("hidden");
+
     fetch(apiUrl)
       .then((response) => response.json())
       .then((data) => {
@@ -96,6 +101,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         displayData(data, responseElement);
+
+        responseElement.classList.remove("hidden");
 
         document.getElementById("response_plus").innerText = JSON.stringify(
           data,
